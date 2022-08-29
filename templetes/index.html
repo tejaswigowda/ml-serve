@@ -4,55 +4,6 @@
   <title> 
     Server side pose-net
   </title>
-  <!--<script>function getXMLHTTPRequest()
-  {
-      var request;
-      // Lets try using ActiveX to instantiate the XMLHttpRequest object
-      try{
-          request = new ActiveXObject("Microsoft.XMLHTTP");
-      }catch(ex1){
-          try{
-              request = new ActiveXObject("Msxml2.XMLHTTP");
-          }catch(ex2){
-              request = null;
-          }
-      }
-
-      // If the previous didn't work, lets check if the browser natively support XMLHttpRequest
-      if(!request && typeof XMLHttpRequest != "undefined"){
-          //The browser does, so lets instantiate the object
-          request = new XMLHttpRequest();
-      }
-
-      return request;
-  }
-
-
-  function loadURL(filename, callback)
-  {
-      var aXMLHttpRequest = getXMLHTTPRequest();
-      var allData;
-
-      if (aXMLHttpRequest)
-      {
-          aXMLHttpRequest.open("GET", filename, true);
-
-        aXMLHttpRequest.onreadystatechange = function (aEvt) {
-          if(aXMLHttpRequest.readyState == 4){
-          allData = aXMLHttpRequest.responseText;
-          callback(allData)
-          }
-        };
-
-        //Lets fire off the request
-          aXMLHttpRequest.send(null);
-      }
-      else
-      {
-          //Oh no, the XMLHttpRequest object couldn't be instantiated.
-          alert("A problem occurred instantiating the XMLHttpRequest object.");
-      }
-  }</script> -->
 </head>
 <body>
 <div id="container">
@@ -77,11 +28,11 @@
             function handleSuccess(stream) {
               const video = document.querySelector('video');
               const videoTracks = stream.getVideoTracks();
-              console.log('Got stream with constraints:', constraints);
-              console.log(`Using video device: ${videoTracks[0].label}`);
+              //console.log('Got stream with constraints:', constraints);
+              //console.log(`Using video device: ${videoTracks[0].label}`);
               window.stream = stream; // make variable available to browser console
               video.srcObject = stream;
-              setInterval(getFrame, 10000/30);
+              setInterval(getFrame, 1000/60);
             }
             
             function handleError(error) {
@@ -138,8 +89,7 @@
             
                 };
                 xhr.open("POST", "/sendFrame/", true);
-                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-                
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");               
                 xhr.send(fd);
             
             }

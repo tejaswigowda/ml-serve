@@ -1,25 +1,18 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render
 from django.http import HttpResponse
-from django.contrib import messages
 from urllib.parse import unquote
 from django.views.decorators.csrf import csrf_exempt
 import json
-import time
 import tensorflow as tf
 import numpy as np
 import io
 from PIL import Image
 import base64
-#loaded = posenet.decode_multiple_poses
-from . import drawing
-import cv2
-from matplotlib import pyplot as plt
 import tensorflow_hub as hub
-from tensorflow_docs.vis import embed
+
 model_name = "movenet_lightning"
 module = hub.load("https://tfhub.dev/google/movenet/singlepose/thunder/4")
 input_size = 256
-
 
 KEYPOINT_DICT = {
     'nose': 0,
@@ -40,6 +33,10 @@ KEYPOINT_DICT = {
     'left_ankle': 15,
     'right_ankle': 16
 }
+
+config = tf.compat.v1.ConfigProto()
+config.gpu_options.allow_growth=True
+sess=tf.compat.v1.Session(config=config)
 
 
 def movenet(input_image):
@@ -67,29 +64,36 @@ def movenet(input_image):
 @csrf_exempt
 def sendFrame(request):
     
-    start= time.time()
+    #start= time.time()
     if request.method == 'POST':
         data = unquote(request.body)
         data = str(request.body)
-        data = data.split("------")[1].split("jpeg;base64,")[1]
-        
-        data = (data + '='*(4-len(data)%4)) if len(data)%4 != 0 else data        
-        temp = base64.b64decode(data)
-        #temp = base64.urlsafe_b64decode(data)
+        data = data.split("------")[1].split("jpeg;base64,")[1]       
+        temp = base64.b64decode(data+ '==')
         image = Image.open(io.BytesIO(temp))
         
         image_np = np.array(image)
         Tens = tf.convert_to_tensor(image_np)
         input_image=tf.cast(Tens, tf.int32)
-        input_image = tf.expand_dims(input_image, axis=0)
-        input_image = tf.image.resize_with_pad(input_image, input_size, input_size)
-       
+        input_image = input_image[None,:,:,:]
+        
         result = np.squeeze(movenet(input_image))
         new_dict = dict(zip(KEYPOINT_DICT.keys(), list(result)))
-        print(time.time()- start)
+        #print(time.time()- start)
         return HttpResponse(json.dumps(str(new_dict)))
        
     else:    
         return render(request,'index.html')
 
 ## Source : https://www.tensorflow.org/hub/tutorials/movenet
+#input_image = tf.expand_dims(input_image, axis=0)
+#input_image = tf.image.resize_with_pad(input_image)
+#temp = base64.urlsafe_b64decode(data)
+#data = (data + '='*(4-len(data)%4)) if len(data)%4 != 0 else data  
+#loaded = posenet.decode_multiple_poses
+#from . import drawing
+#import cv2
+#from matplotlib import pyplot as plt
+#from django.contrib import messages
+#import time
+#from tensorflow_docs.vis import embed
