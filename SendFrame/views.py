@@ -68,7 +68,9 @@ def sendFrame(request):
     if request.method == 'POST':
         data = unquote(request.body)
         data = str(request.body)
-        data = data.split("------")[1].split("jpeg;base64,")[1]       
+        
+        data = data.split("jpeg;base64,")[1].split("------")[0]
+        # data = data.replace(" ","")     
         temp = base64.b64decode(data+ '==')
         image = Image.open(io.BytesIO(temp))
         
@@ -76,11 +78,14 @@ def sendFrame(request):
         Tens = tf.convert_to_tensor(image_np)
         input_image=tf.cast(Tens, tf.int32)
         input_image = input_image[None,:,:,:]
-        
+
         result = np.squeeze(movenet(input_image))
+        #print(result)
         new_dict = dict(zip(KEYPOINT_DICT.keys(), list(result)))
         #print(time.time()- start)
-        return HttpResponse(json.dumps(str(new_dict)))
+        return HttpResponse(json.dumps(str(new_dict))) 
+        
+       
     else:    
         return render(request,'index.html')  
 
