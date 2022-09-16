@@ -14,7 +14,7 @@ app.use(express.static(__dirname + '/public'));
 
 
 app.post('/sendFrame', function(req, res){
-    axios.post("http://127.0.0.1:8000/sendFrame/", req.body ).then(function(response){
+    axios.post("http://127.0.0.1:1234/sendFrame/", req.body ).then(function(response){
         res.end(JSON.stringify(response.data))
     }).catch(err => console.error(err));      
 });

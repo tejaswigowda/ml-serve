@@ -14,5 +14,13 @@
     "serverKeyType": "RSA-2048",
     "subscriberEmail": "tejaswi@asu.edu"
   },
-  "sites": [{ "subject": "mlserve.tejaswigowda.com"}]
+  "sites": [
+    {
+      "subject": "mlserve.tejaswigowda.com",
+      "altnames": [
+        "mlserve.tejaswigowda.com"
+      ],
+      "renewAt": 1
+    }
+  ]
 }
