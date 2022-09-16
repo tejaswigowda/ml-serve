@@ -33,7 +33,7 @@ function handleSuccess(stream) {
   console.log(`Using video device: ${videoTracks[0].label}`);
   window.stream = stream; // make variable available to browser console
   video.srcObject = stream;
-  setInterval(getFrame, 100000/30);
+  setInterval(getFrame, 1000/30);
 }
 
 function handleError(error) {
