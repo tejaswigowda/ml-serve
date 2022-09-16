@@ -81,9 +81,8 @@ def sendFrame(request):
         new_dict = dict(zip(KEYPOINT_DICT.keys(), list(result)))
         #print(time.time()- start)
         return HttpResponse(json.dumps(str(new_dict)))
-       
     else:    
-        return render(request,'index.html')
+        return render(request,'index.html')  
 
 ## Source : https://www.tensorflow.org/hub/tutorials/movenet
 #input_image = tf.expand_dims(input_image, axis=0)
