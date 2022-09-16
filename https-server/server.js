@@ -20,8 +20,8 @@ app.post('/sendFrame', function(req, res){
 });
 
 console.log("Simple static server listening at http://" + hostname + ":" + port);
-app.listen(port);
-// // DO NOT DO app.listen() unless we're testing this directly
-// if (require.main === module) { app.listen(8080); }
-// // Instead do export the app:
-// else{ module.exports = app; }
+// app.listen(port);
+// DO NOT DO app.listen() unless we're testing this directly
+if (require.main === module) { app.listen(8080); }
+// Instead do export the app:
+else{ module.exports = app; }

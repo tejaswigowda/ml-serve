@@ -9,7 +9,7 @@
     "method-override": "^3.0.0"
   },
   "scripts": {
-    "start": "node server.js"
+    "start": "node https.js"
   },
   "name": "https-server",
   "description": "https://bucket470570.s3.us-west-2.amazonaws.com",
