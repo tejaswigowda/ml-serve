@@ -5,6 +5,7 @@ require("greenlock-express")
     .init({
         packageRoot: __dirname,
         configDir: "./greenlock.d",
+        server: 'https://acme-v02.api.letsencrypt.org/directory',
  
         // contact for security and critical bug notices
         maintainerEmail: 'tejaswi@asu.edu',
