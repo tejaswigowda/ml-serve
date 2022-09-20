@@ -4,12 +4,39 @@
   <title> 
     Server side pose-net
   </title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0, user-scalable=no">
+  <style>body {
+      margin: 0;
+    }
+    #stats {
+      position: relative;
+      width: 100%;
+      height: 80px;
+    }
+    #main {
+      position: relative;
+      margin: 0;
+    }
+    #canvas-wrapper,
+    #scatter-gl-container {
+      position: relative;
+    }</style>
+  <script src='asyncReq.js'></script>
+  <meta charset="utf-8">
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils_3d/control_utils_3d.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  
 </head>
 <body>
 <div id="container">
 
     <video id="gum-local" autoplay playsinline></video>
 
+    <canvas class="output_canvas" width="1280px" height="720px"></canvas>
+    <video hidden="hidden" class="input_video"></video>
     <div id="resMsg"></div>
 
 </div>
@@ -18,89 +45,58 @@
 <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
 -->
 </body>
-  <script>
-                  // Put variables in global scope to make them available to the browser console.
-            const constraints = window.constraints = {
-              audio: false,
-              video: {width: {exact: 256}, height: {exact: 256}}
-            };
-            
-            function handleSuccess(stream) {
-              const video = document.querySelector('video');
-              const videoTracks = stream.getVideoTracks();
-              //console.log('Got stream with constraints:', constraints);
-              //console.log(`Using video device: ${videoTracks[0].label}`);
-              window.stream = stream; // make variable available to browser console
-              video.srcObject = stream;
-              setInterval(getFrame, 1000/30);
-            }
-            
-            function handleError(error) {
-              if (error.name === 'OverconstrainedError') {
-                const v = constraints.video;
-                errorMsg(`The resolution ${v.width.exact}x${v.height.exact} px is not supported by your device.`);
-              } else if (error.name === 'NotAllowedError') {
-                errorMsg('Permissions have not been granted to use your camera and ' +
-                  'microphone, you need to allow the page access to your devices in ' +
-                  'order for the demo to work.');
-              }
-              errorMsg(`getUserMedia error: ${error.name}`, error);
-            }
-            
-            function errorMsg(msg, error) {
-              const errorElement = document.querySelector('#errorMsg');
-              errorElement.innerHTML += `<p>${msg}</p>`;
-              if (typeof error !== 'undefined') {
-                console.error(error);
-              }
-            }
-            
-            async function init() {
-              try {
-                const stream = await navigator.mediaDevices.getUserMedia(constraints);
-                handleSuccess(stream);
-              } catch (e) {
-                handleError(e);
-              }
-            }
-            
-            function getFrame(){
-                var canvas = document.createElement('canvas');
-                canvas.width = 256;
-                canvas.height = 256;
-                var ctx = canvas.getContext('2d');
-                var video = document.getElementById('gum-local');
-                ctx.drawImage(video, 0, 0, 256, 256);
-                var dataURL = canvas.toDataURL('image/jpeg');
-            
-                      
-               var fd = new FormData();
-               fd.append('data', (dataURL));
-             //  fd.append('date', (new Date()).toString());
-            
-                var xhr = new XMLHttpRequest();
-            
-                xhr.onreadystatechange = function(e) {  
-                  if (xhr.readyState != 4) { return; }
-                  // callback logic
-                    var results = JSON.parse(xhr.responseText);
-                    document.getElementById('resMsg').innerHTML = xhr.responseText;
-             //             document.getElementById('resMsg').innerHTML += new Date() + "<br>";
-            
-                };
-                xhr.open("POST", "/sendFrame/", true);
-                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");               
-                xhr.send(fd);
-            
-            }
-            
-            
-            
-            
-                  init();
+  <script type="module">
+      // Put variables in global scope to make them available to the browser console.
+  const videoElement = document.getElementsByClassName('input_video')[0];
+  const canvasElement = document.getElementsByClassName('output_canvas')[0];
+  const canvasCtx = canvasElement.getContext('2d');
+  const camera = new Camera(videoElement, {
+    onFrame: async () => {
+      await getFrame();
+    },
+    width: 480,
+    height: 480
+  });
+  camera.start();
 
+
+function getFrame(){
+    var canvas = document.createElement('canvas');
+    canvas.width = 480;
+    canvas.height = 480;
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(videoElement, 0, 0, 480, 480);
+    var dataURL = canvas.toDataURL('image/jpeg');          
+    var fd = new FormData();
+    fd.append('data', encodeURIComponent(dataURL));
+    var xhr = new XMLHttpRequest();
+    
+
+    xhr.onreadystatechange = function(e) {  
+      if (xhr.readyState != 4) { return; }
+      // callback logic
+        var results = JSON.parse(xhr.responseText).split("landmark");
+        results.shift()
+        canvasCtx.save();
+        canvasCtx.globalCompositeOperation = 'source-over';
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        canvasCtx.drawImage(videoElement, 0, 0,canvasElement.width, canvasElement.height);
+        canvasCtx.globalCompositeOperation = 'source-over';
+        drawConnectors(canvasCtx, results,
+                      {color: '#00FF00', lineWidth: 4});
+        drawLandmarks(canvasCtx, results,
+                {color: '#FF0000', lineWidth: 2});
+        canvasCtx.restore();
+
+        document.getElementById('resMsg').innerHTML = JSON.parse(xhr.responseText);
+
+    };
+    xhr.open("POST", "/sendFrame", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.send(fd);
+
+}
 
   </script>
 
 </html>
-
