@@ -5,17 +5,16 @@
     "connect": "^3.7.0",
     "errorhandler": "^1.5.1",
     "express": "^4.18.1",
-    "greenlock-express": "^4.0.3",
+    "greenlock-express": "^2.7.18",
     "method-override": "^3.0.0"
   },
   "scripts": {
-    "start": "node server.js"
+    "start": "node https.js"
   },
   "name": "https-server",
   "description": "https://bucket470570.s3.us-west-2.amazonaws.com",
   "version": "1.0.0",
   "main": "https.js",
-  "devDependencies": {},
   "author": "tejaswi@asu.edu",
   "license": "ISC"
 }
