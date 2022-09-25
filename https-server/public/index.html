@@ -37,7 +37,7 @@
 
     <canvas class="output_canvas" width="1280px" height="720px"></canvas>
     <video hidden="hidden" class="input_video"></video>
-    <div id="resMsg"></div>
+    <!-- <div id="resMsg"></div> -->
 
 </div>
 
@@ -52,13 +52,15 @@
   const canvasCtx = canvasElement.getContext('2d');
   const camera = new Camera(videoElement, {
     onFrame: async () => {
-      await setInterval(getFrame, 1000/60);
+      // await setInterval(getFrame, 1000/60);
+      getFrame()
     },
     width: 480,
     height: 480
   });
   camera.start();
-
+  const POSE_CONNECTIONS=[[0, 1],[1, 2],[2, 3],[3, 7],[0, 4],[4, 5],[5, 6],[6, 8],[9, 10],[11, 12],[11, 13],[13, 15],[15, 17],[15, 19],[15, 21],[17, 19],[12, 14],
+[14, 16],[16, 18],[16, 20],[16, 22],[18, 20],[11, 23],[12, 24],[23, 24],[23, 25],[24, 26],[25, 27],[26, 28],[27, 29],[28, 30],[29, 31],[30, 32],[27, 31],[28, 32]]
 
 function getFrame(){
     var canvas = document.createElement('canvas');
@@ -71,7 +73,6 @@ function getFrame(){
     fd.append('data', encodeURIComponent(dataURL));
     var xhr = new XMLHttpRequest();
     
-
     xhr.onreadystatechange = function(e) {  
       if (xhr.readyState != 4) { return; }
       // callback logic
@@ -95,13 +96,13 @@ function getFrame(){
         canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
         canvasCtx.drawImage(videoElement, 0, 0,canvasElement.width, canvasElement.height);
         canvasCtx.globalCompositeOperation = 'source-over';
-        drawConnectors(canvasCtx, res,
+        drawConnectors(canvasCtx, res, POSE_CONNECTIONS,
                       {color: '#00FF00', lineWidth: 4});
         drawLandmarks(canvasCtx, res,
                 {color: '#FF0000', lineWidth: 2});
         canvasCtx.restore();
 
-        document.getElementById('resMsg').innerHTML = JSON.parse(xhr.responseText);
+        // document.getElementById('resMsg').innerHTML = JSON.parse(xhr.responseText);
 
     };
     xhr.open("POST", "/sendFrame", true);
