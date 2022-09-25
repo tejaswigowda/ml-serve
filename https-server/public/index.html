@@ -52,7 +52,7 @@
   const canvasCtx = canvasElement.getContext('2d');
   const camera = new Camera(videoElement, {
     onFrame: async () => {
-      await getFrame();
+      await setInterval(getFrame, 1000/60);
     },
     width: 480,
     height: 480
@@ -77,14 +77,27 @@ function getFrame(){
       // callback logic
         var results = JSON.parse(xhr.responseText).split("landmark");
         results.shift()
+        var d = results[0].split('\n')
+        var res=[]
+
+        for (let i=0;i<results.length;i++){
+          var d = results[i].split('\n');
+          var obj = {
+            x : parseFloat(d[1].split(" ")[3]),
+            y : parseFloat(d[2].split(" ")[3]),
+            z : parseFloat(d[3].split(" ")[3]),
+            visibility : parseFloat(d[4].split(" ")[3]),
+          };
+          res.push(obj)
+        };
         canvasCtx.save();
         canvasCtx.globalCompositeOperation = 'source-over';
         canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
         canvasCtx.drawImage(videoElement, 0, 0,canvasElement.width, canvasElement.height);
         canvasCtx.globalCompositeOperation = 'source-over';
-        drawConnectors(canvasCtx, results,
+        drawConnectors(canvasCtx, res,
                       {color: '#00FF00', lineWidth: 4});
-        drawLandmarks(canvasCtx, results,
+        drawLandmarks(canvasCtx, res,
                 {color: '#FF0000', lineWidth: 2});
         canvasCtx.restore();
 
