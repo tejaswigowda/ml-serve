@@ -39,7 +39,7 @@ def sendFrame(request):
     #start= time.time()
     if request.method == 'POST':
         data = unquote(request.body)
-        data = str(request.body)
+        # data = str(request.body)
         
         data = data.split("jpeg;base64,")[1].split("------")[0]
         # data = data.replace(" ","")     
