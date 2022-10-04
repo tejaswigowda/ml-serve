@@ -69,7 +69,7 @@
   const canvasCtx = canvasElement.getContext('2d');
   const camera = new Camera(videoElement, {
     onFrame: async () => {
-      // await setInterval(getFrame, 1000/60);
+      // await setInterval(getFrame, 100000/60);
       getFrame()
     },
     width: 1280,
@@ -97,18 +97,17 @@ function getFrame(){
       if (xhr.readyState != 4) { return; }
       // callback logic
         document.getElementById('resMsg').innerHTML = xhr.responseText;
-        var results = JSON.parse(xhr.responseText).split('\n');
-        results.shift()
-        // var d = results[0].split('\n')
-        var res=[]
+        const results = JSON.parse(xhr.responseText);
+        // // var d = results[0].split('\n')
+        // var res=[]
 
-        // for (let i=0;i<results.length;i++){
-        //   var d = results[i].split(' ');
+        // for (let i=0;i<results['poses3d'][0].length;i++){
+        //   var d = results['poses3d'][0][i]
         //   var obj = {
-        //     x : parseFloat(d[3]),
-        //     y : parseFloat(d[6]),
-        //     // z : parseFloat(d[3]),
-        //     // visibility : parseFloat(d[4].split(" ")[3]),
+        //     x : (d[1]/1280),
+        //     y : (d[2]/720),
+        //     z : (d[0]),
+        //     visibility : 0.75,
         //   };
         //   res.push(obj)
         // };
@@ -117,10 +116,21 @@ function getFrame(){
         canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
         canvasCtx.drawImage(videoElement, 0, 0,canvasElement.width, canvasElement.height);
         canvasCtx.globalCompositeOperation = 'source-over';
-        drawConnectors(canvasCtx, res, POSE_CONNECTIONS,
-                      {visibilityMin: 0.65,color: '#0000FF', lineWidth: 4});
-        drawLandmarks(canvasCtx, res,
-                {visibilityMin: 0.65,color: '#FF0000', lineWidth: 2});
+        if (results['persons'] >0 ){
+          for(var i = 0; i < results['edges'].length - 1; i++){
+              canvasCtx.beginPath();
+              var d = results['edges'][i]
+              canvasCtx.moveTo(results['poses2d'][0][d[0]][0], results['poses2d'][0][d[0]][1]);
+              canvasCtx.lineTo(results['poses2d'][0][d[1]][0], results['poses2d'][0][d[1]][0]);
+              canvasCtx.lineWidth = 4;
+              canvasCtx.strokeStyle = '#0000FF';
+              canvasCtx.stroke();
+          }
+        }
+        // drawConnectors(canvasCtx, results['poses2d'][0], results['edges'],
+        //               {visibilityMin: 0.65,color: '#0000FF', lineWidth: 4});
+        // drawLandmarks(canvasCtx, results['poses2d'][0],
+        //         {visibilityMin: 0.65,color: '#FF0000', lineWidth: 2});
         canvasCtx.restore();
     };
     

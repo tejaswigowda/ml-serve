@@ -26,11 +26,11 @@ def download_model(model_type):
     model_path = os.path.join(os.path.dirname(model_zippath), model_type)
     return model_path
 
-gc.collect()
-config = ConfigProto()
-config.gpu_options.per_process_gpu_memory_fraction = 0.2
-config.gpu_options.allow_growth = True
-session = InteractiveSession(config=config)
+# gc.collect()
+# config = ConfigProto()
+# config.gpu_options.per_process_gpu_memory_fraction = 0.2
+# config.gpu_options.allow_growth = True
+# session = InteractiveSession(config=config)
 
 model = tf.saved_model.load(download_model('metrabs_mob3l_y4t'))
 @csrf_exempt
@@ -50,13 +50,19 @@ def sendFrame(request):
         Tens = tf.convert_to_tensor(image_np)
         # input_image=tf.cast(Tens, tf.int32)
         # input_image = input_image[None,:,:,:]
-        result = model.detect_poses(Tens, skeleton='coco_19')
+        pred = model.detect_poses(Tens, skeleton='smpl_24')
 
         # result = np.squeeze(movenet(input_image))
         #print(result)
         #new_dict = dict(zip(KEYPOINT_DICT.keys(), list(result)))
         #print(time.time()- start)
-        return HttpResponse(json.dumps(str(result['poses3d'].numpy()))) 
+        d = {}
+        d["persons"] =  pred['boxes'].numpy().shape[0]
+        d["edges"] = model.per_skeleton_joint_edges['smpl_24'].numpy().tolist()
+        d["boxes"] = pred['boxes'].numpy().tolist()
+        d["poses3d"] = pred['poses3d'].numpy().tolist()
+        d["poses2d"] = pred['poses2d'].numpy().tolist()
+        return HttpResponse(json.dumps(d)) 
         
        
     else:    
