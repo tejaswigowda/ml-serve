@@ -97,51 +97,51 @@ function getFrame(){
       if (xhr.readyState != 4) { return; }
       // callback logic
         document.getElementById('resMsg').innerHTML = xhr.responseText;
-        // const results = JSON.parse(xhr.responseText);
-        // // // var d = results[0].split('\n')
-        // // var res=[]
+          const results = JSON.parse(xhr.responseText);
+          // // var d = results[0].split('\n')
+          // var res=[]
 
-        // // for (let i=0;i<results['poses3d'][0].length;i++){
-        // //   var d = results['poses3d'][0][i]
-        // //   var obj = {
-        // //     x : (d[1]/1280),
-        // //     y : (d[2]/720),
-        // //     z : (d[0]),
-        // //     visibility : 0.75,
-        // //   };
-        // //   res.push(obj)
-        // // };
-        // canvasCtx.save();
-        // canvasCtx.globalCompositeOperation = 'source-over';
-        // canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-        // canvasCtx.drawImage(videoElement, 0, 0,canvasElement.width, canvasElement.height);
-        // canvasCtx.globalCompositeOperation = 'source-over';
-        // if (results['persons'] >0 ){
-        //   for(var i = 0; i < results['edges'].length - 1; i++){
-        //       canvasCtx.beginPath();
-        //       var d = results['edges'][i]
-        //       canvasCtx.moveTo( results['poses2d'][0][d[0]][1],results['poses2d'][0][d[0]][0]);
-        //       canvasCtx.lineTo( results['poses2d'][0][d[1]][0],results['poses2d'][0][d[1]][0]);
-        //       canvasCtx.lineWidth = 4;
-        //       canvasCtx.strokeStyle = '#0000FF';
-        //       canvasCtx.stroke();
-        //   }
-        // }
-        // // drawConnectors(canvasCtx, results['poses2d'][0], results['edges'],
-        // //               {visibilityMin: 0.65,color: '#0000FF', lineWidth: 4});
-        // // drawLandmarks(canvasCtx, results['poses2d'][0],
-        // //         {visibilityMin: 0.65,color: '#FF0000', lineWidth: 2});
-        // canvasCtx.restore();
-    };
-    
-    // endTime = d.getTime();
-    // total = total + (endTime-startTime);
-    // frames = frames + 1
-    // if (total >=1000){
-    //   document.getElementById('resMsg').innerHTML = frames
-    //   frames= 0
-    //   total = 0
-    // };
+          // for (let i=0;i<results['poses3d'][0].length;i++){
+          //   var d = results['poses3d'][0][i]
+          //   var obj = {
+          //     x : (d[1]/1280),
+          //     y : (d[2]/720),
+          //     z : (d[0]),
+          //     visibility : 0.75,
+          //   };
+          //   res.push(obj)
+          // };
+          canvasCtx.save();
+          canvasCtx.globalCompositeOperation = 'source-over';
+          canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+          canvasCtx.drawImage(videoElement, 0, 0,canvasElement.width, canvasElement.height);
+          canvasCtx.globalCompositeOperation = 'source-over';
+          if (results['persons'] >0 ){
+            for(var i = 0; i < results['edges'].length - 1; i++){
+                canvasCtx.beginPath();
+                var d = results['edges'][i]
+                canvasCtx.moveTo( results['poses2d'][0][d[0]][0],results['poses2d'][0][d[0]][1]);
+                canvasCtx.lineTo( results['poses2d'][0][d[1]][0],results['poses2d'][0][d[1]][1]);
+                canvasCtx.lineWidth = 4;
+                canvasCtx.strokeStyle = '#0000FF';
+                canvasCtx.stroke();
+            }
+          }
+          // drawConnectors(canvasCtx, results['poses2d'][0], results['edges'],
+          //               {visibilityMin: 0.65,color: '#0000FF', lineWidth: 4});
+          // drawLandmarks(canvasCtx, results['poses2d'][0],
+          //         {visibilityMin: 0.65,color: '#FF0000', lineWidth: 2});
+          canvasCtx.restore();
+      };
+      
+      // endTime = d.getTime();
+      // total = total + (endTime-startTime);
+      // frames = frames + 1
+      // if (total >=1000){
+      //   document.getElementById('resMsg').innerHTML = frames
+      //   frames= 0
+      //   total = 0
+      // };
 
     xhr.open("POST", "/sendFrame", true);
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
